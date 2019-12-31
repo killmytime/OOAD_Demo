@@ -4,7 +4,7 @@ import entity.Task;
 import entity.TaskPool;
 
 import java.util.UUID;
-
+//Admin用户认证从简处理，字符串
 public interface AdminTaskService {
     public Task postTask(Task task);
     public boolean deleteTask(UUID taskID);//其他用户的指定任务状态为发布的变为删除
