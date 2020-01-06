@@ -1,7 +1,5 @@
 package configuration;
 
-import lombok.Data;
-
 public enum UserProfile {
     ADMIN("0","ADMIN","ADMIN","^passwordisnotADMIN!",0),user1("123","killmytime","27382711","jadk1292d",10000),user2("124","yuyu","563452525","asdfaf134141a",7758258);
     private String userId;

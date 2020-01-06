@@ -7,6 +7,7 @@ import entity.Task;
 import entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import service.AdminTaskService;
 import service.UserService;
@@ -23,12 +24,13 @@ import java.util.Date;
 class UserTaskServiceImplTest {
     UserService userService = new UserServiceImpl();
     UserTaskService userTaskService = new UserTaskServiceImpl();
-    User user1, user2;
+    AdminTaskService adminTaskService = new AdminTaskServiceImpl();
+    User user1, user2,admin;
 
     @BeforeEach
     void setUp() {
-        User admin = userService.login(UserProfile.ADMIN.getUsername(), UserProfile.ADMIN.getPassword());
-        AdminTaskService adminTaskService = new AdminTaskServiceImpl();
+        admin=userService.login(UserProfile.ADMIN.getUsername(), UserProfile.ADMIN.getPassword());
+
         Task taskOnce = new Task();
         taskOnce.setTaskName("有剩余次数任务");
         taskOnce.setLimit(12);
@@ -57,8 +59,9 @@ class UserTaskServiceImplTest {
     void tearDown() {
     }
     //Todo 接受日期不对的每日任务
+    @Order(1)
     @Test
-    void acceptTask1() {
+    void acceptTask() {
         int limit1 = user1.getDailyLimit();
         //无权限操作
         assertFalse(userTaskService.acceptTask(user1.getTaskPool().getTasks().get(0), user2, UserProfile.user1));
@@ -104,8 +107,9 @@ class UserTaskServiceImplTest {
 
     }
     //未对积分进行操作，故不在此测试积分是否变动
+    @Order(2)
     @Test
-    void abandonTask2() {
+    void abandonTask() {
         //无权限操作
         assertFalse(userTaskService.abandonTask(user1.getTaskPool().getTasks().get(0), user2, UserProfile.user1));
         assertFalse(userTaskService.abandonTask(user1.getTaskPool().getTasks().get(0), new User(), UserProfile.user1));
@@ -113,6 +117,7 @@ class UserTaskServiceImplTest {
         assertFalse(userTaskService.acceptTask(new Task(), user1, UserProfile.user1));
         //放弃有剩余次数任务
         Task task = user1.getTaskPool().getTasks().get(0);
+        System.out.println(task.getTaskStatus().getValue());
         assertTrue(userTaskService.abandonTask(task, user1, UserProfile.user1));
         assertEquals(TaskStatus.POST, task.getTaskStatus());
         //放弃未进行的任务
@@ -121,18 +126,33 @@ class UserTaskServiceImplTest {
         //放弃每日任务
         DailyTask taskDaily = (DailyTask) user1.getTaskPool().getTasks().get(1);
         assertTrue(userTaskService.abandonTask(taskDaily,user1,UserProfile.user1));
-        assertEquals(TaskStatus.POST,taskDaily.getTaskStatus());
+        assertEquals(TaskStatus.ABANDON,taskDaily.getTaskStatus());
         //放弃无限任务
+        Task taskUnLimit = user1.getTaskPool().getTasks().get(2);
+        assertTrue(userTaskService.abandonTask(taskUnLimit,user1,UserProfile.user1));
+        assertEquals(TaskStatus.POST,taskDaily.getTaskStatus());
     }
 
     //Todo 财务结算待补充
     //逻辑与abandonTask大致相同，除结算部分之外,故这里仅针对一项任务做测试
+    @Order(3)
     @Test
-    void finishTask3() {
-        //数据初始化--无限任务
+    void finishTask() {
+        //数据初始化--接受无限任务
+        assertTrue(user1.getDailyLimit()>0);
+        Task taskUnLimit = user1.getTaskPool().getTasks().get(2);
+        int unLimit = taskUnLimit.getLimit();
+        assertTrue(userTaskService.acceptTask(taskUnLimit, user1, UserProfile.user1));
+        assertEquals(unLimit, taskUnLimit.getLimit());
+        assertEquals(TaskStatus.PROCESSING, taskUnLimit.getTaskStatus());
         //无权限操作
+        assertFalse(userTaskService.finishTask(user1.getTaskPool().getTasks().get(0), user2, UserProfile.user1));
+        assertFalse(userTaskService.finishTask(user1.getTaskPool().getTasks().get(0), new User(), UserProfile.user1));
         //完成不存在的任务
+        assertFalse(userTaskService.acceptTask(new Task(), user1, UserProfile.user1));
         //完成无限任务--完成+结算etc.
+        assertTrue(userTaskService.finishTask(taskUnLimit,user1,UserProfile.user1));
+        //Todo 结算的校验
     }
 
 

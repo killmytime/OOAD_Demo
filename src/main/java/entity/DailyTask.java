@@ -1,12 +1,8 @@
 package entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
 public class DailyTask extends Task {
     private Date finishDate;
     private Date today;
@@ -22,5 +18,21 @@ public class DailyTask extends Task {
         task.setFinishDate(this.finishDate);
         task.setToday(this.today);
         return task;
+    }
+
+    public Date getFinishDate() {
+        return finishDate;
+    }
+
+    public void setFinishDate(Date finishDate) {
+        this.finishDate = finishDate;
+    }
+
+    public Date getToday() {
+        return today;
+    }
+
+    public void setToday(Date today) {
+        this.today = today;
     }
 }

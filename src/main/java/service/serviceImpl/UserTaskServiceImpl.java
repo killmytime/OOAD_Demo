@@ -24,8 +24,8 @@ public class UserTaskServiceImpl implements UserTaskService {
                 if (taskItem.getTaskStatus() == TaskStatus.POST && taskItem.getTaskID().equals(task.getTaskID()) && taskItem.acceptTask()) {
                     //dailyTask,简单的标识
                     if (taskItem instanceof DailyTask) {
-                        if (((DailyTask) taskItem).getFinishDate() != null && ((DailyTask) taskItem).getFinishDate().before(((DailyTask) taskItem).getToday())) {
-                            ((DailyTask) taskItem).setFinishDate(null);
+                        if (((DailyTask) taskItem).getFinishDate() == null || ((DailyTask) taskItem).getFinishDate().before(((DailyTask) taskItem).getToday())) {
+                            ((DailyTask) taskItem).setFinishDate(new Date());
                             ((DailyTask) taskItem).setToday(null);
                         } else return false;
                     }
@@ -62,7 +62,7 @@ public class UserTaskServiceImpl implements UserTaskService {
     public boolean abandonTask(Task task, User user, UserProfile auth) {
         if (checkUser(user, auth)) {
             for (Task taskItem : user.getTaskPool().getTasks()) {
-                //仅考虑发布状态的任务
+                //仅考虑进行状态的任务
                 if (taskItem.getTaskStatus() == TaskStatus.PROCESSING && taskItem.getTaskID().equals(task.getTaskID())) {
                     //dailyTask,每日任务放弃了第二天还是可以做==>推之任务都可以这么来，判断剩余次数即可
                     if (taskItem instanceof DailyTask) {

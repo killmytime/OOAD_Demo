@@ -6,6 +6,7 @@ import configuration.UserProfile;
 import entity.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import service.AdminTaskService;
 import service.UserService;
@@ -34,6 +35,7 @@ class AdminTaskServiceImplTest {
     /**
      * 重复任务不做考虑，唯一生成id，考虑很多任务的可重复性，季节性周期发布等等
      */
+    @Order(1)
     @Test
     void postTask() {
         //缺失任务名字的为null
@@ -71,7 +73,7 @@ class AdminTaskServiceImplTest {
 
 
     }
-
+    @Order(2)
     @Test
     void deleteTask() {
         int size = Global.AdminPool.getTasks().size();
