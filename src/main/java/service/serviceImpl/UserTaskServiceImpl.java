@@ -24,10 +24,13 @@ public class UserTaskServiceImpl implements UserTaskService {
                 if (taskItem.getTaskStatus() == TaskStatus.POST && taskItem.getTaskID().equals(task.getTaskID()) && taskItem.acceptTask()) {
                     //dailyTask,简单的标识
                     if (taskItem instanceof DailyTask) {
-                        ((DailyTask) taskItem).setFinishDate(null);
-                        ((DailyTask) taskItem).setToday(null);
+                        if (((DailyTask) taskItem).getFinishDate() != null && ((DailyTask) taskItem).getFinishDate().before(((DailyTask) taskItem).getToday())) {
+                            ((DailyTask) taskItem).setFinishDate(null);
+                            ((DailyTask) taskItem).setToday(null);
+                        } else return false;
                     }
                     taskItem.setTaskStatus(TaskStatus.PROCESSING);
+                    user.taskAccepted();
                     return true;
                 }
             }
@@ -45,8 +48,9 @@ public class UserTaskServiceImpl implements UserTaskService {
                     if (taskItem instanceof DailyTask) {
                         ((DailyTask) taskItem).setToday(new Date());
                         ((DailyTask) taskItem).setFinishDate(new Date());
-                    }
-                    taskItem.setTaskStatus(TaskStatus.POST);
+                        taskItem.setTaskStatus(TaskStatus.FINISH);
+                    } else
+                        taskItem.setTaskStatus(TaskStatus.POST);
                     return true;
                 }
             }
@@ -64,8 +68,9 @@ public class UserTaskServiceImpl implements UserTaskService {
                     if (taskItem instanceof DailyTask) {
                         ((DailyTask) taskItem).setToday(new Date());
                         ((DailyTask) taskItem).setFinishDate(new Date());
-                    }
-                    taskItem.setTaskStatus(TaskStatus.POST);
+                        taskItem.setTaskStatus(TaskStatus.ABANDON);
+                    } else
+                        taskItem.setTaskStatus(TaskStatus.POST);
                     return true;
                 }
             }
