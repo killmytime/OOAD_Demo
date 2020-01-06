@@ -16,10 +16,10 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AdminTaskImplTest {
+class AdminTaskServiceImplTest {
     private static User admin;
     private UserService userService = new UserServiceImpl();
-    private AdminTaskService adminTaskService = new AdminTaskImpl();
+    private AdminTaskService adminTaskService = new AdminTaskServiceImpl();
 
     @BeforeEach
     void setUp() {
@@ -80,6 +80,8 @@ class AdminTaskImplTest {
         task0.setLimit(11);
         task0 = adminTaskService.postTask(task0, admin);
         assertEquals(++size, Global.AdminPool.getTasks().size());
+        //无权限操作
+        assertNull(adminTaskService.deleteTask(task0.getTaskID(),new User()));
         //删除任务测试
         task0 = adminTaskService.deleteTask(task0.getTaskID(), admin);
         assertEquals(0, task0.getLimit());

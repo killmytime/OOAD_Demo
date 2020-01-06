@@ -2,6 +2,7 @@ package service.serviceImpl;
 
 import configuration.TaskStatus;
 import configuration.UserProfile;
+import entity.DailyTask;
 import entity.Task;
 import entity.TaskPool;
 import entity.User;
@@ -13,16 +14,18 @@ import java.util.UUID;
 import static configuration.Global.AdminPool;
 import static configuration.Global.userList;
 
-public class AdminTaskImpl implements AdminTaskService {
+public class AdminTaskServiceImpl implements AdminTaskService {
     public Task postTask(Task task, User user) {
         if (checkAdmin(user)) {
             if (task.getTaskName().equals("")) return null;
             ArrayList<Task> tasks = AdminPool.getTasks();
             task.setTaskStatus(TaskStatus.POST);
             task.setTaskID(UUID.randomUUID());
+            if (task instanceof DailyTask)
+                task.setLimit(-1);
             tasks.add(task);
             AdminPool.setTasks(tasks);
-            new AdminTaskImpl().taskReload(task);
+            new AdminTaskServiceImpl().taskReload(task);
             return task;
         }
         return null;
@@ -36,7 +39,7 @@ public class AdminTaskImpl implements AdminTaskService {
                     task.setTaskStatus(TaskStatus.DELETE);
                     task.setLimit(0);
                     AdminPool.setTasks(tasks);
-                    new AdminTaskImpl().taskReload(task);
+                    new AdminTaskServiceImpl().taskReload(task);
                     return task;
                 }
             }
@@ -82,6 +85,6 @@ public class AdminTaskImpl implements AdminTaskService {
     }
 
     private boolean checkAdmin(User user) {
-        return user!=null&&user.getAuth().equals(UserProfile.ADMIN) && user.getUsername().equals(UserProfile.ADMIN.getUsername()) && user.getPassword().equals(UserProfile.ADMIN.getPassword());
+        return user!=null&&user.getAuth()!=null&&user.getAuth().equals(UserProfile.ADMIN) && user.getUsername().equals(UserProfile.ADMIN.getUsername()) && user.getPassword().equals(UserProfile.ADMIN.getPassword());
     }
 }
