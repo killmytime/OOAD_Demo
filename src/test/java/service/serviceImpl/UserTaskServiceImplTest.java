@@ -110,6 +110,10 @@ class UserTaskServiceImplTest {
     @Order(2)
     @Test
     void abandonTask() {
+        //初始化
+        userTaskService.acceptTask(user1.getTaskPool().getTasks().get(0), user1, UserProfile.user1);
+        userTaskService.acceptTask(user1.getTaskPool().getTasks().get(1), user1, UserProfile.user1);
+        userTaskService.acceptTask(user1.getTaskPool().getTasks().get(2), user1, UserProfile.user1);
         //无权限操作
         assertFalse(userTaskService.abandonTask(user1.getTaskPool().getTasks().get(0), user2, UserProfile.user1));
         assertFalse(userTaskService.abandonTask(user1.getTaskPool().getTasks().get(0), new User(), UserProfile.user1));
@@ -117,7 +121,7 @@ class UserTaskServiceImplTest {
         assertFalse(userTaskService.acceptTask(new Task(), user1, UserProfile.user1));
         //放弃有剩余次数任务
         Task task = user1.getTaskPool().getTasks().get(0);
-        System.out.println(task.getTaskStatus().getValue());
+        System.out.println(task.getLimit());
         assertTrue(userTaskService.abandonTask(task, user1, UserProfile.user1));
         assertEquals(TaskStatus.POST, task.getTaskStatus());
         //放弃未进行的任务
@@ -130,7 +134,7 @@ class UserTaskServiceImplTest {
         //放弃无限任务
         Task taskUnLimit = user1.getTaskPool().getTasks().get(2);
         assertTrue(userTaskService.abandonTask(taskUnLimit,user1,UserProfile.user1));
-        assertEquals(TaskStatus.POST,taskDaily.getTaskStatus());
+        assertEquals(TaskStatus.POST,taskUnLimit.getTaskStatus());
     }
 
     //Todo 财务结算待补充
