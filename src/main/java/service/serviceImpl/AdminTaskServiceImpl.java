@@ -1,7 +1,6 @@
 package service.serviceImpl;
 
 import configuration.TaskStatus;
-import configuration.UserProfile;
 import entity.DailyTask;
 import entity.Task;
 import entity.TaskPool;
@@ -13,14 +12,16 @@ import java.util.UUID;
 
 import static configuration.Global.AdminPool;
 import static configuration.Global.userList;
+import static utils.Verification.adminVerification;
+import static utils.Verification.taskVerification;
 
 public class AdminTaskServiceImpl implements AdminTaskService {
     public Task postTask(Task task, User user) {
-        if (checkAdmin(user)) {
-            if (task.getTaskName().equals("")) return null;
+        if (adminVerification(user)) {
+            if (!taskVerification(task, TaskStatus.OFFLINE)) return null;
             ArrayList<Task> tasks = AdminPool.getTasks();
             task.setTaskStatus(TaskStatus.POST);
-            task.setTaskID(UUID.randomUUID());
+            task.setTaskId(UUID.randomUUID());
             if (task instanceof DailyTask)
                 task.setLimit(-1);
             tasks.add(task);
@@ -31,11 +32,15 @@ public class AdminTaskServiceImpl implements AdminTaskService {
         return null;
     }
 
-    public Task deleteTask(UUID taskID, User user) {
-        if (checkAdmin(user)) {
+    public Task deleteTask(UUID taskId, User user) {
+        if (adminVerification(user)) {
             ArrayList<Task> tasks = AdminPool.getTasks();
             for (Task task : tasks) {
-                if (taskID.equals(task.getTaskID())) {
+                if (taskId.equals(task.getTaskId())) {
+                    if (taskVerification(task, TaskStatus.DELETE)) {
+                        System.out.println("已删除");
+                        return null;
+                    }
                     task.setTaskStatus(TaskStatus.DELETE);
                     task.setLimit(0);
                     AdminPool.setTasks(tasks);
@@ -50,41 +55,40 @@ public class AdminTaskServiceImpl implements AdminTaskService {
 
     //针对一个数据持久化之后可能的场景，将主任务更新到用户个人任务那里去同时不修改用户已经更改的数据，题目没有要求到修改任务，所以这里只考虑添加删除，粗糙的做个遍历好了
     public void taskReload(Task task) {
-            if (task.getTaskStatus() == TaskStatus.DELETE)
-                for (User userItem : userList) {
-                    ArrayList<Task> taskArrayList = userItem.getTaskPool().getTasks();
-                    for (Task taskItem : taskArrayList) {
-                        if (taskItem.getTaskID().equals(task.getTaskID())) {
-                            if (taskItem.getTaskStatus() == TaskStatus.POST)
-                                taskItem.setTaskStatus(TaskStatus.DELETE);
-                            taskItem.setLimit(task.getLimit());
-                            TaskPool taskPool = userItem.getTaskPool();
-                            taskPool.setTasks(taskArrayList);
-                            userItem.setTaskPool(taskPool);
-                            break;
-                        }
-                    }
-                }
-            else if (task.getTaskStatus() == TaskStatus.POST)
-                for (User userItem : userList) {
-                    ArrayList<Task> taskArrayList = userItem.getTaskPool().getTasks();
-                    boolean flag = true;
-                    for (Task taskItem : taskArrayList) {
-                        if (taskItem.getTaskID().equals(task.getTaskID())) {
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag) {
-                        taskArrayList.add(task);
+        if(task!=null&&!task.getTaskName().equals(""))
+        if (task.getTaskStatus() == TaskStatus.DELETE)
+            for (User userItem : userList) {
+                ArrayList<Task> taskArrayList = userItem.getTaskPool().getTasks();
+                for (Task taskItem : taskArrayList) {
+                    if (taskItem.getTaskId().equals(task.getTaskId())) {
+                        if (taskItem.getTaskStatus() == TaskStatus.POST)
+                            taskItem.setTaskStatus(TaskStatus.DELETE);
+                        taskItem.setLimit(task.getLimit());
                         TaskPool taskPool = userItem.getTaskPool();
                         taskPool.setTasks(taskArrayList);
                         userItem.setTaskPool(taskPool);
+                        break;
                     }
                 }
+            }
+        else if (task.getTaskStatus() == TaskStatus.POST)
+            for (User userItem : userList) {
+                ArrayList<Task> taskArrayList = userItem.getTaskPool().getTasks();
+                boolean flag = true;
+                for (Task taskItem : taskArrayList) {
+                    if (taskItem.getTaskId().equals(task.getTaskId())) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    taskArrayList.add(task);
+                    TaskPool taskPool = userItem.getTaskPool();
+                    taskPool.setTasks(taskArrayList);
+                    userItem.setTaskPool(taskPool);
+                }
+            }
     }
 
-    private boolean checkAdmin(User user) {
-        return user!=null&&user.getAuth()!=null&&user.getAuth().equals(UserProfile.ADMIN) && user.getUsername().equals(UserProfile.ADMIN.getUsername()) && user.getPassword().equals(UserProfile.ADMIN.getPassword());
-    }
+
 }

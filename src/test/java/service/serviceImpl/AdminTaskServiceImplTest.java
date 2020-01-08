@@ -83,9 +83,9 @@ class AdminTaskServiceImplTest {
         task0 = adminTaskService.postTask(task0, admin);
         assertEquals(++size, Global.AdminPool.getTasks().size());
         //无权限操作
-        assertNull(adminTaskService.deleteTask(task0.getTaskID(),new User()));
+        assertNull(adminTaskService.deleteTask(task0.getTaskId(),new User()));
         //删除任务测试
-        task0 = adminTaskService.deleteTask(task0.getTaskID(), admin);
+        task0 = adminTaskService.deleteTask(task0.getTaskId(), admin);
         assertEquals(0, task0.getLimit());
         assertEquals(TaskStatus.DELETE, task0.getTaskStatus());
         assertEquals(size, Global.AdminPool.getTasks().size());
@@ -106,23 +106,23 @@ class AdminTaskServiceImplTest {
         //删除测试,通过模拟正在进行和未进行的任务来测试
         ArrayList<Task> tasks = new ArrayList<>();
         Task task1 = new Task();
-        task1.setTaskID(UUID.randomUUID());
+        task1.setTaskId(UUID.randomUUID());
         task1.setTaskName("test1");
         task1.setLimit(-1);
         task1.setTaskStatus(TaskStatus.PROCESSING);
         Task task2 = new Task();
-        task2.setTaskID(UUID.randomUUID());
+        task2.setTaskId(UUID.randomUUID());
         task2.setTaskName("test2");
         task2.setLimit(2020);
         task2.setTaskStatus(TaskStatus.POST);
         tasks.add(task1.copy());
         tasks.add(task2.copy());
         TaskPool taskPool1 = new TaskPool();
-        taskPool1.setUserId(user1.getUserID());
+        taskPool1.setUserId(user1.getUserId());
         taskPool1.setTasks(tasks);
         user1.setTaskPool(taskPool1);
         TaskPool taskPool2 = new TaskPool();
-        taskPool2.setUserId(user2.getUserID());
+        taskPool2.setUserId(user2.getUserId());
         taskPool2.setTasks(tasks);
         user2.setTaskPool(taskPool2);
 

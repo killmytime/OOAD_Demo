@@ -1,6 +1,7 @@
 package configuration;
 
 public enum UserProfile {
+    //ADMIN为管理员账户，user1和user2为普通用户
     ADMIN("0","ADMIN","ADMIN","^passwordisnotADMIN!",0),user1("123","killmytime","27382711","jadk1292d",10000),user2("124","yuyu","563452525","asdfaf134141a",7758258);
     private String userId;
     private String username;

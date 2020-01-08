@@ -1,17 +1,8 @@
 package configuration;
 
 public enum TaskStatus {
-    //这里描述如果觉得词不达意，全局修改一下就好了
-    OFFLINE(0), POST(1), PROCESSING(2), FINISH(3), ABANDON(-1),DELETE(-2);
-
-    private int value;
-
-    TaskStatus(int value) {
-        this.value = value;
-    }
-
-    public int getValue(){
-        return value;
-    }
-
+    //分别对应离线状态，发布状态，任务进行状态，任务完成状态，任务放弃状态，任务删除状态
+    //其中离线状态为保留状态
+    // 任务完成状态和任务放弃状态基本不使用，但基于可扩展的理念有所涉及
+    OFFLINE, POST, PROCESSING, FINISH, ABANDON,DELETE;
 }

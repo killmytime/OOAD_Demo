@@ -130,7 +130,7 @@ class UserTaskServiceImplTest {
         //放弃每日任务
         DailyTask taskDaily = (DailyTask) user1.getTaskPool().getTasks().get(1);
         assertTrue(userTaskService.abandonTask(taskDaily,user1,UserProfile.user1));
-        assertEquals(TaskStatus.ABANDON,taskDaily.getTaskStatus());
+        assertEquals(TaskStatus.POST,taskDaily.getTaskStatus());
         //放弃无限任务
         Task taskUnLimit = user1.getTaskPool().getTasks().get(2);
         assertTrue(userTaskService.abandonTask(taskUnLimit,user1,UserProfile.user1));

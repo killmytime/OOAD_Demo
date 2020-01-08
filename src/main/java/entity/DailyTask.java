@@ -9,7 +9,7 @@ public class DailyTask extends Task {
 
     public DailyTask copy(){
         DailyTask task=new DailyTask();
-        task.setTaskID(this.getTaskID());
+        task.setTaskId(this.getTaskId());
         task.setLimit(this.getLimit());
         task.setTaskName(this.getTaskName());
         task.setTaskDescription(this.getTaskDescription());
