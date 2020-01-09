@@ -4,7 +4,7 @@ import java.util.Stack;
 
 public class Transaction {
     private Stack<Flow> flows=new Stack<>();
-    private float total;
+    private float total =0;
     private String userId;
 
     public Stack<Flow> getFlows() {

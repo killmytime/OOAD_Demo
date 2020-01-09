@@ -7,6 +7,7 @@ import entity.Task;
 import entity.User;
 import service.UserTaskService;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import static utils.Verification.userVerification;
@@ -78,6 +79,20 @@ public class UserTaskServiceImpl implements UserTaskService {
             }
         }
         return false;
+    }
+
+    public ArrayList<Task> getTasks(TaskStatus taskStatus, User user, UserProfile auth) {
+        ArrayList<Task> tasks=new ArrayList<>();
+        if (userVerification(user, auth)) {
+            for (Task taskItem : user.getTaskPool().getTasks()) {
+                //仅考虑发布状态的任务&&任务id校验&&对于不同任务的剩余次数的处理
+                if (taskItem.getTaskStatus() == TaskStatus.POST &&taskItem.getLimit()!=0) {
+                    tasks.add(taskItem);
+                }
+            }
+            return tasks;
+        }
+        return null;
     }
 
 

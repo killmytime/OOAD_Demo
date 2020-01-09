@@ -27,6 +27,6 @@ public class Verification {
 
     public static boolean commodityVerification(Commodity commodity, User user, UserProfile auth) {
         //商品不为空，商品库存大于0，用户身份验证，用户积分大于商品单价（默认兑换单个）
-        return commodity != null && commodity.getStorage() > 0 && userVerification(user, auth) && user.getCredits() >= commodity.getStorage();
+        return commodity != null && commodity.getStorage() > 0 && userVerification(user, auth) && user.getCredits() >= commodity.getCredits();
     }
 }

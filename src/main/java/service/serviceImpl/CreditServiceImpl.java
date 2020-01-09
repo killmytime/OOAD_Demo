@@ -25,7 +25,7 @@ public class CreditServiceImpl implements CreditService {
     public boolean exchangeCalculation(Commodity commodity, User user) {
         if (!commodity.exchangeCommodity()) return false;
         user.setCredits(user.getCredits()-commodity.getCredits());
-        Flow newFlow=new Flow(user.getUserId()+String.valueOf(new Date().getTime()) +(++Global.index), CreditOrigin.EXCHANGE,commodity.getCredits(),"兑换商品"+commodity.getName());
+        Flow newFlow=new Flow(user.getUserId()+String.valueOf(new Date().getTime()) +(++Global.index), CreditOrigin.EXCHANGE,-commodity.getCredits(),"兑换商品"+commodity.getName());
         Transaction transaction=user.getTransaction();
         Stack<Flow> flows=transaction.getFlows();
         float total = transaction.getTotal()-commodity.getCredits();
